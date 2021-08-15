@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package test;
+option go_package = "grpc-echo/test";
+
+message TestRequest {
+  string message = 1;
+}
+
+message TestResponse {
+  string message = 1;
+}
+message EmptyRequest {}
+message EmptyResponse {}
+
+service TestService {
+  rpc TestEcho(TestRequest) returns (TestResponse){}
+  rpc Empty(EmptyRequest) returns (EmptyResponse){}
+}

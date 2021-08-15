@@ -1,28 +1,29 @@
 package controller
 import (
+	"grpc-echo/pkg/app"
 	"grpc-echo/pkg/models"
-	"grpc-echo/pkg/storage"
 	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
 
-// GetStudents
 func GetStudents(c echo.Context) error {
-	students, _ := GetRepoStudents()
+	students, err := GetRepoStudents()
+	if err != nil {
+		log.Panic(err)
+	}
 	return c.JSON(http.StatusOK, students)
 }
 
 func GetRepoStudents() ([]models.Students, error) {
-	students := []models.Students{}
-	db, err := storage.Get()
+	var students []models.Students
+	db, err := app.GetDB()
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
-	if err := db.DB.Client.Find(&students).Error; err != nil {
+	if err := db.Find(&students).Error; err != nil {
 		return nil, err
 	}
-
 	return students, nil
 }

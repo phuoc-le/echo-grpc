@@ -1,9 +1,12 @@
-package storage
+package app
 
 import (
+	"gorm.io/gorm"
 	"grpc-echo/pkg/cache"
 	"grpc-echo/pkg/config"
 	"grpc-echo/pkg/db"
+	"grpc-echo/pkg/models"
+	"log"
 )
 
 // Application holds commonly used app wide data, for ease of DI
@@ -17,28 +20,33 @@ type Application struct {
 // reference to both
 func Get() (*Application, error) {
 	cfg := config.Get()
-
-	db, err := db.Get(cfg.GetDBConnStr())
+	dbData, err := db.Get(cfg.GetDBConnStr())
 	if err != nil {
+		log.Panic(err)
 		return nil, err
+	}
+	errMr := dbData.Client.AutoMigrate(&models.Students{})
+	if errMr != nil {
+		log.Panic(errMr)
 	}
 	client, err := cache.InitRedisClient(cfg.GetRedisUrl(), cfg.GetRedisPassword(), cfg.GetRedisDB())
 	if err != nil {
+		log.Panic(err)
 		return nil, err
 	}
 	return &Application{
-		DB:  db,
+		DB:  dbData,
 		Cfg: cfg,
 		RC:  client,
 	}, nil
 }
 
-func GetDB() (*db.DB, error) {
+func GetDB() (*gorm.DB, error) {
 	rs, err := Get()
 	if err != nil {
 		return nil, err
 	}
-	return rs.DB, nil
+	return rs.DB.Client, nil
 
 }
 

@@ -11,4 +11,6 @@ func Init(e *echo.Echo) {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 	e.GET("/users/:id", controller.GetUser)
+	e.GET("/students", controller.GetStudents)
+
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	"log"
 )
 
 type Client struct {
@@ -16,12 +17,12 @@ func InitRedisClient(redisUrl string, password string, db int) (*Client, error) 
 	client := redis.NewClient(&redis.Options{
 		Addr:     redisUrl,
 		Password: password,
-		DB:       db, //default
+		DB:       db,
 	})
 
 	pong, err := client.Ping(ctx).Result()
 	if err != nil {
-		fmt.Println("Cannot Initialize Re*redis.Clientdis Client ", err)
+		log.Fatal("Cannot Initialize Re*redis.Clientdis Client", err)
 	}
 	fmt.Println("Redis Client Successfully Initialized . . .", pong)
 

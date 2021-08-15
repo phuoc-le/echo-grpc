@@ -32,3 +32,20 @@ func Get() (*Application, error) {
 		RC:  client,
 	}, nil
 }
+
+func GetDB() (*db.DB, error) {
+	rs, err := Get()
+	if err != nil {
+		return nil, err
+	}
+	return rs.DB, nil
+
+}
+
+func GetCache() (*cache.Client, error) {
+	rs, err := Get()
+	if err != nil {
+		return nil, err
+	}
+	return rs.RC, nil
+}

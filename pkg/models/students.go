@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type Students struct {
 	gorm.Model
-	Id   string `json:"id"`
-	Name string `json:"name"`
+	Name string  `gorm:"not null"`
+	Email string `gorm:"unique,not null,"`
+	Phone string
 }

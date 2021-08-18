@@ -6,9 +6,9 @@ import (
 	"net/http"
 )
 
-func MainGroup(g *echo.Group) {
+func UserGroup(g *echo.Group) {
+	g.GET("/users/:id", handler.GetUser)
 	g.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, Home!")
+		return c.String(http.StatusOK, "Hello, User!")
 	})
-	g.GET("/login", handler.Login)
 }

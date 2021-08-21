@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4/middleware"
 	gp "grpc-echo/pkg/grpc"
 	"grpc-echo/pkg/router"
 	"log"
+	"os"
 )
 
 func main() {
@@ -14,10 +14,8 @@ func main() {
 	}
 	r := router.New()
 
-	gp.GreeterService()
-	// Middleware
-	r.Use(middleware.Logger())
-	//e.Use(middleware.Recover())
-	r.Logger.Fatal(r.Start(":8888"))
+	gp.GreeterService("Test")
+
+	r.Logger.Fatal(r.Start(":"+os.Getenv("API_PORT")))
 
 }

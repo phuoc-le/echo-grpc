@@ -20,24 +20,30 @@
 package main
 
 import (
+	"fmt"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
-	sv "grpc-echo/pkg/grpc"
+	ge "grpc-echo/pkg/grpc"
 	"log"
 	"net"
+	"os"
 )
 
-const (
-	port = ":50051"
-)
 
 func main() {
-	lis, err := net.Listen("tcp", port)
+	if err := godotenv.Load(); err != nil {
+		log.Fatal(err)
+	}
+	lis, err := net.Listen("tcp", ":"+os.Getenv("GRPC_PORT"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	sv.Init(s)
+	ge.Init(s)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
+	fmt.Println("http server started on ", os.Getenv("GRPC_PORT"))
+	log.Println("http server started on ", os.Getenv("GRPC_PORT"))
 }

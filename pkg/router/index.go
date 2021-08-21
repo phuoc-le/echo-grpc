@@ -2,15 +2,18 @@ package router
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"grpc-echo/pkg/middlewares"
 )
 
 func New() *echo.Echo {
 	e := echo.New()
-
+	e.Use(middleware.BodyLimit("2M"))
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 	// create groups
 	adminGroup := e.Group("/admin")
-	//cookieGroup := e.Group("/cookie")
 	mainGroup := e.Group("")
 	jwtGroup := e.Group("/jwt")
 	userGroup := e.Group("/user")
@@ -20,15 +23,13 @@ func New() *echo.Echo {
 	// set all middlewares
 	//middlewares.SetMainMiddlewares(e)
 	middlewares.SetAdminMiddlewares(adminGroup)
-	//middlewares.SetCookieMiddlewares(cookieGroup)
 	middlewares.SetJwtMiddlewares(jwtGroup)
-	//middlewares.SetMainMiddlewares(e)
+	middlewares.SetJwtMiddlewares(studentGroup)
 
 
 	//// set admin routes
 	AdminGroup(adminGroup)
 	//// set group routes
-	//CookieGroup(cookieGroup)
 	JwtGroup(jwtGroup)
 	UserGroup(userGroup)
 	StudentGroup(studentGroup)

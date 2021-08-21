@@ -2,9 +2,9 @@ package grpc
 
 import (
 	"context"
+	"github.com/labstack/gommon/log"
 	"google.golang.org/grpc"
 	pb "grpc-echo/pkg/proto"
-	"github.com/labstack/gommon/log"
 	"time"
 )
 
@@ -21,13 +21,13 @@ func client() *grpc.ClientConn {
 	return conn
 }
 
-func GreeterService() {
+func GreeterService( name string) {
 
 	defer client().Close()
 	greeterCnn := pb.NewGreeterServiceClient(client())
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	greeterRs, err := greeterCnn.SayHello(ctx, &pb.HelloRequest{Name: "Phuoc"})
+	greeterRs, err := greeterCnn.SayHello(ctx, &pb.HelloRequest{Name: name})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}

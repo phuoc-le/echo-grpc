@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/labstack/echo/v4"
 	"grpc-echo/pkg/app"
 	"grpc-echo/pkg/models"
@@ -8,7 +9,8 @@ import (
 	"net/http"
 	"strconv"
 )
-// Get List User
+
+// GetStudents Get List User
 func GetStudents(c echo.Context) error {
 	students, err := getRepoStudents()
 	if err != nil {
@@ -29,7 +31,8 @@ func getRepoStudents() (*[]models.Students, error) {
 	}
 	return &students, nil
 }
-// Get User By Id
+
+// GetStudent Get UserById
 func GetStudent(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -37,12 +40,11 @@ func GetStudent(c echo.Context) error {
 	}
 	student, err := getStudent(id)
 	if err != nil {
-		log.Fatal(err)
 		return c.JSON(http.StatusNotFound, err)
 	}
 	return c.JSON(http.StatusOK, student)
 }
-func getStudent(id int)(*models.Students, error)  {
+func getStudent(id int) (*models.Students, error) {
 	var student models.Students
 	db, err := app.GetDB()
 	if err != nil {
@@ -56,20 +58,21 @@ func getStudent(id int)(*models.Students, error)  {
 	return &student, nil
 }
 
-// Create User
+// CreateStudent Create User
 func CreateStudent(c echo.Context) error {
-	name := c.FormValue("name")
-	email := c.FormValue("email")
-	phone := c.FormValue("phone")
-	student, err := createStudent(name, email, phone)
+	student := models.Students{}
+	if err := c.Bind(&student); err != nil {
+		return err
+	}
+	rs, err := createStudent(student)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	return c.JSON(http.StatusOK, student)
+	return c.JSON(http.StatusOK, rs)
 }
 
-func createStudent(name, email, phone string) (*models.Students, error) {
+func createStudent(student models.Students) (*models.Students, error) {
 	db, err := app.GetDB()
 	if err != nil {
 		log.Panic(err)
@@ -78,7 +81,6 @@ func createStudent(name, email, phone string) (*models.Students, error) {
 	if err != nil {
 		log.Panic(err)
 	}
-	student := models.Students{Name: name, Email: email, Phone: phone}
 	if err := db.Create(&student).Error; err != nil {
 		log.Panic(err)
 		return nil, err
@@ -86,45 +88,36 @@ func createStudent(name, email, phone string) (*models.Students, error) {
 	return &student, nil
 }
 
-//Update
-
+// UpdateStudent /**** Update User ****/
 func UpdateStudent(c echo.Context) error {
-	id, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		log.Fatal(err)
+	student := models.Students{}
+	if err := c.Bind(&student); err != nil {
+		return err
 	}
-	name := c.FormValue("name")
-	email := c.FormValue("email")
-	phone := c.FormValue("phone")
-	student, err := updateStudent(id ,name, email, phone)
+	fmt.Println(student)
+	res, err := updateStudent(student)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	return c.JSON(http.StatusOK, student)
+	return c.JSON(http.StatusOK, res)
 }
 
-func updateStudent(id int,name, email, phone string) (*models.Students, error) {
+func updateStudent(student models.Students) (*models.Students, error) {
 	db, err := app.GetDB()
 	if err != nil {
 		log.Panic(err)
 	}
-	var student models.Students
-	db.First(&student, id)
 
-	log.Print(student)
-	//student.Name = name
-	//student.Email = email
-	//student.Phone =phone
-	//if err := db.Save(&student).Error; err != nil {
-	//	log.Panic(err)
-	//	return nil, err
-	//}
+	fmt.Println("Student Update", student)
+	if err := db.Save(&student).Error; err != nil {
+		log.Panic(err)
+		return nil, err
+	}
 	return &student, nil
 }
 
 //Delete
-
 func DeleteStudent(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -137,7 +130,7 @@ func DeleteStudent(c echo.Context) error {
 	}
 	return c.JSON(http.StatusOK, student)
 }
-func deleteStudent(id int)(*models.Students, error)  {
+func deleteStudent(id int) (*models.Students, error) {
 	var student models.Students
 	db, err := app.GetDB()
 	if err != nil {
